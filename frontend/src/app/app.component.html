@@ -2,11 +2,31 @@
   <div class="app-header-inner">
     <a class="brand" routerLink="/employees">
       <span class="brand-mark" aria-hidden="true">E</span>
-      <span>Employee Management</span>
+      <span class="brand-text">
+        <span class="brand-name">Employee Management</span>
+        <span class="brand-sub">Beinex &mdash; HR Portal</span>
+      </span>
     </a>
+
     <nav aria-label="Main">
-      <a routerLink="/employees" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Employees</a>
-      <a routerLink="/employees/new" routerLinkActive="active">Add employee</a>
+      <a routerLink="/employees" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span>Employees</span>
+      </a>
+      <a routerLink="/employees/new" routerLinkActive="active">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+        <span>Add Employee</span>
+      </a>
     </nav>
   </div>
 </header>
@@ -16,8 +36,17 @@
 </main>
 
 @if (notify.message(); as toast) {
-  <div class="toast" [class.toast-error]="toast.type === 'error'" role="status" aria-live="polite">
+  <div
+    class="toast"
+    role="status"
+    aria-live="polite"
+  >
+    @if (toast.type === 'success') {
+      <span class="toast-success-dot" aria-hidden="true"></span>
+    } @else {
+      <span class="toast-error-dot" aria-hidden="true"></span>
+    }
     <span>{{ toast.text }}</span>
-    <button type="button" class="toast-close" aria-label="Dismiss" (click)="notify.dismiss()">&times;</button>
+    <button type="button" class="toast-close" aria-label="Dismiss" (click)="notify.dismiss()">&#215;</button>
   </div>
 }

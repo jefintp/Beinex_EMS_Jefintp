@@ -39,7 +39,12 @@ export class EmployeeFormComponent implements OnInit {
   readonly today = localToday();
 
   readonly employeeId = signal<number | null>(null);
-  readonly isEdit = computed(() => this.employeeId() !== null);
+  readonly isEdit    = computed(() => this.employeeId() !== null);
+  readonly subtitle  = computed(() =>
+    this.isEdit()
+      ? "Update this employee's details below."
+      : 'Fill in the details to add a new team member.'
+  );
 
   readonly loading = signal(false);
   readonly saving = signal(false);

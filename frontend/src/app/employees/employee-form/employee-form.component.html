@@ -1,135 +1,282 @@
 <section class="page page-narrow">
-  <header class="page-header">
-    <div>
-      <h1>{{ isEdit() ? 'Edit employee' : 'Add employee' }}</h1>
-      <p class="muted">
-        {{ isEdit() ? 'Update this employee’s details.' : 'Fill in the details of the new employee.' }}
-      </p>
-    </div>
-  </header>
 
   @if (loading()) {
+    <!-- ── Loading skeleton ───────────────────────────────── -->
     <div class="card state-card" role="status">
       <span class="spinner" aria-hidden="true"></span>
       <span>Loading employee…</span>
     </div>
+
   } @else if (loadError(); as message) {
+    <!-- ── Load error ─────────────────────────────────────── -->
     <div class="card">
       <div class="alert alert-error" role="alert">{{ message }}</div>
-      <a class="btn" routerLink="/employees">Back to employees</a>
+      <div style="margin-top:1rem">
+        <a class="btn" routerLink="/employees">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Back to employees
+        </a>
+      </div>
     </div>
+
   } @else {
-    <form class="card form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      @if (submitError(); as message) {
-        <div class="alert alert-error" role="alert">{{ message }}</div>
-      }
+    <!-- ── Form Card ──────────────────────────────────────── -->
+    <div class="card form" [formGroup]="form" (submit)="submit()" style="display:block">
 
-      <div class="form-grid">
-        <div class="field" [class.has-error]="errorFor('name')">
-          <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
-          <input
-            id="name"
-            type="text"
-            formControlName="name"
-            autocomplete="off"
-            [attr.aria-invalid]="!!errorFor('name')"
-            [attr.aria-describedby]="errorFor('name') ? 'name-error' : null"
-          />
-          @if (errorFor('name'); as msg) {
-            <p class="field-error" id="name-error">{{ msg }}</p>
+      <!-- Gradient header strip -->
+      <div class="form-card-header">
+        <div class="form-card-header-icon">
+          @if (isEdit()) {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/>
+              <line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
           }
         </div>
-
-        <div class="field" [class.has-error]="errorFor('email')">
-          <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            autocomplete="off"
-            [attr.aria-invalid]="!!errorFor('email')"
-            [attr.aria-describedby]="errorFor('email') ? 'email-error' : null"
-          />
-          @if (errorFor('email'); as msg) {
-            <p class="field-error" id="email-error">{{ msg }}</p>
-          }
-        </div>
-
-        <div class="field" [class.has-error]="errorFor('department')">
-          <label for="department">Department <span class="req" aria-hidden="true">*</span></label>
-          <select
-            id="department"
-            formControlName="department"
-            [attr.aria-invalid]="!!errorFor('department')"
-            [attr.aria-describedby]="errorFor('department') ? 'department-error' : null"
-          >
-            <option value="" disabled>Select a department</option>
-            @for (department of departments; track department) {
-              <option [value]="department">{{ department }}</option>
-            }
-          </select>
-          @if (errorFor('department'); as msg) {
-            <p class="field-error" id="department-error">{{ msg }}</p>
-          }
-        </div>
-
-        <div class="field" [class.has-error]="errorFor('designation')">
-          <label for="designation">Designation <span class="req" aria-hidden="true">*</span></label>
-          <input
-            id="designation"
-            type="text"
-            formControlName="designation"
-            autocomplete="off"
-            [attr.aria-invalid]="!!errorFor('designation')"
-            [attr.aria-describedby]="errorFor('designation') ? 'designation-error' : null"
-          />
-          @if (errorFor('designation'); as msg) {
-            <p class="field-error" id="designation-error">{{ msg }}</p>
-          }
-        </div>
-
-        <div class="field" [class.has-error]="errorFor('joining_date')">
-          <label for="joining_date">Joining date <span class="req" aria-hidden="true">*</span></label>
-          <input
-            id="joining_date"
-            type="date"
-            [max]="today"
-            formControlName="joining_date"
-            [attr.aria-invalid]="!!errorFor('joining_date')"
-            [attr.aria-describedby]="errorFor('joining_date') ? 'joining_date-error' : null"
-          />
-          @if (errorFor('joining_date'); as msg) {
-            <p class="field-error" id="joining_date-error">{{ msg }}</p>
-          }
-        </div>
-
-        <div class="field" [class.has-error]="errorFor('status')">
-          <label for="status">Status <span class="req" aria-hidden="true">*</span></label>
-          <select
-            id="status"
-            formControlName="status"
-            [attr.aria-invalid]="!!errorFor('status')"
-            [attr.aria-describedby]="errorFor('status') ? 'status-error' : null"
-          >
-            @for (status of statuses; track status.value) {
-              <option [value]="status.value">{{ status.label }}</option>
-            }
-          </select>
-          @if (errorFor('status'); as msg) {
-            <p class="field-error" id="status-error">{{ msg }}</p>
-          }
+        <div class="form-card-header-text">
+          <h1>{{ isEdit() ? 'Edit Employee' : 'Add Employee' }}</h1>
+          <p>{{ subtitle() }}</p>
         </div>
       </div>
 
-      <div class="form-actions">
-        <a class="btn" routerLink="/employees" [class.is-disabled]="saving()">Cancel</a>
-        <button type="submit" class="btn btn-primary" [disabled]="saving()">
-          @if (saving()) {
-            <span class="spinner spinner-small" aria-hidden="true"></span>
-          }
-          {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Add employee' }}
-        </button>
-      </div>
-    </form>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate style="display:contents">
+
+        @if (submitError(); as message) {
+          <div class="alert alert-error" role="alert" style="margin-bottom:0.5rem">{{ message }}</div>
+        }
+
+        <!-- ── Section: Personal Info ──────────────────────── -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <span class="form-section-title">Personal Information</span>
+          </div>
+
+          <div class="form-grid">
+            <!-- Name -->
+            <div class="field" [class.has-error]="errorFor('name')">
+              <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </span>
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="e.g. Jane Smith"
+                  autocomplete="off"
+                  [attr.aria-invalid]="!!errorFor('name')"
+                  [attr.aria-describedby]="errorFor('name') ? 'name-error' : null"
+                />
+              </div>
+              @if (errorFor('name'); as msg) {
+                <p class="field-error" id="name-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+
+            <!-- Email -->
+            <div class="field" [class.has-error]="errorFor('email')">
+              <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </span>
+                <input
+                  id="email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="e.g. jane@company.com"
+                  autocomplete="off"
+                  [attr.aria-invalid]="!!errorFor('email')"
+                  [attr.aria-describedby]="errorFor('email') ? 'email-error' : null"
+                />
+              </div>
+              @if (errorFor('email'); as msg) {
+                <p class="field-error" id="email-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section: Job Details ────────────────────────── -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <div class="form-section-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              </svg>
+            </div>
+            <span class="form-section-title">Job Details</span>
+          </div>
+
+          <div class="form-grid">
+            <!-- Department -->
+            <div class="field" [class.has-error]="errorFor('department')">
+              <label for="department">Department <span class="req" aria-hidden="true">*</span></label>
+              <select
+                id="department"
+                formControlName="department"
+                [attr.aria-invalid]="!!errorFor('department')"
+                [attr.aria-describedby]="errorFor('department') ? 'department-error' : null"
+              >
+                <option value="" disabled>Select a department</option>
+                @for (department of departments; track department) {
+                  <option [value]="department">{{ department }}</option>
+                }
+              </select>
+              @if (errorFor('department'); as msg) {
+                <p class="field-error" id="department-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+
+            <!-- Designation -->
+            <div class="field" [class.has-error]="errorFor('designation')">
+              <label for="designation">Designation <span class="req" aria-hidden="true">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="6"/>
+                    <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+                  </svg>
+                </span>
+                <input
+                  id="designation"
+                  type="text"
+                  formControlName="designation"
+                  placeholder="e.g. Senior Engineer"
+                  autocomplete="off"
+                  [attr.aria-invalid]="!!errorFor('designation')"
+                  [attr.aria-describedby]="errorFor('designation') ? 'designation-error' : null"
+                />
+              </div>
+              @if (errorFor('designation'); as msg) {
+                <p class="field-error" id="designation-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+
+            <!-- Joining Date -->
+            <div class="field" [class.has-error]="errorFor('joining_date')">
+              <label for="joining_date">Joining date <span class="req" aria-hidden="true">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </span>
+                <input
+                  id="joining_date"
+                  type="date"
+                  [max]="today"
+                  formControlName="joining_date"
+                  [attr.aria-invalid]="!!errorFor('joining_date')"
+                  [attr.aria-describedby]="errorFor('joining_date') ? 'joining_date-error' : null"
+                />
+              </div>
+              @if (errorFor('joining_date'); as msg) {
+                <p class="field-error" id="joining_date-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+
+            <!-- Status -->
+            <div class="field" [class.has-error]="errorFor('status')">
+              <label for="status">Status <span class="req" aria-hidden="true">*</span></label>
+              <select
+                id="status"
+                formControlName="status"
+                [attr.aria-invalid]="!!errorFor('status')"
+                [attr.aria-describedby]="errorFor('status') ? 'status-error' : null"
+              >
+                @for (status of statuses; track status.value) {
+                  <option [value]="status.value">{{ status.label }}</option>
+                }
+              </select>
+              @if (errorFor('status'); as msg) {
+                <p class="field-error" id="status-error">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {{ msg }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Actions ─────────────────────────────────────── -->
+        <div class="form-actions">
+          <a class="btn" routerLink="/employees" [class.is-disabled]="saving()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Cancel
+          </a>
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            @if (saving()) {
+              <span class="spinner spinner-small" aria-hidden="true"></span>
+            } @else {
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                @if (isEdit()) {
+                  <polyline points="20 6 9 17 4 12"/>
+                } @else {
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                }
+              </svg>
+            }
+            {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Add Employee' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
   }
+
 </section>

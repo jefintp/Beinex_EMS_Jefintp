@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,6 +11,22 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 import { DEPARTMENTS, Employee, STATUSES } from '../employee.model';
 import { EmployeeService } from '../employee.service';
 
+const DEPT_CLASS_MAP: Record<string, string> = {
+  'Engineering':     'dept-engineering',
+  'Human Resources': 'dept-hr',
+  'Finance':         'dept-finance',
+  'Sales':           'dept-sales',
+  'Marketing':       'dept-marketing',
+  'Operations':      'dept-operations',
+  'Support':         'dept-support',
+  'IT':              'dept-it',
+};
+
+const AVATAR_COLORS = [
+  '#4f46e5', '#7c3aed', '#0891b2', '#059669',
+  '#d97706', '#dc2626', '#be185d', '#0369a1',
+];
+
 @Component({
   selector: 'app-employee-list',
   standalone: true,
@@ -18,26 +34,33 @@ import { EmployeeService } from '../employee.service';
   templateUrl: './employee-list.component.html',
 })
 export class EmployeeListComponent {
-  private readonly fb = inject(FormBuilder);
-  private readonly api = inject(EmployeeService);
+  private readonly fb     = inject(FormBuilder);
+  private readonly api    = inject(EmployeeService);
   private readonly notify = inject(NotificationService);
 
   readonly departments = DEPARTMENTS;
-  readonly statuses = STATUSES;
+  readonly statuses    = STATUSES;
 
   readonly filters = this.fb.nonNullable.group({
-    search: '',
+    search:     '',
     department: '',
-    status: '',
+    status:     '',
   });
 
-  readonly employees = signal<Employee[]>([]);
-  readonly loading = signal(true);
-  readonly error = signal<string | null>(null);
+  readonly employees    = signal<Employee[]>([]);
+  readonly loading      = signal(true);
+  readonly error        = signal<string | null>(null);
 
   readonly pendingDelete = signal<Employee | null>(null);
-  readonly deleting = signal(false);
-  readonly deleteError = signal<string | null>(null);
+  readonly deleting      = signal(false);
+  readonly deleteError   = signal<string | null>(null);
+
+  /** Derived stat counts */
+  readonly activeCount   = computed(() => this.employees().filter(e => e.status === 'active').length);
+  readonly inactiveCount = computed(() => this.employees().filter(e => e.status === 'inactive').length);
+
+  /** Skeleton placeholder rows shown while loading. */
+  readonly skeletonRows = [1, 2, 3, 4, 5];
 
   /** Emits to re-run the current query (retry, or after a delete). */
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
@@ -75,13 +98,9 @@ export class EmployeeListComponent {
     return search.trim() !== '' || department !== '' || status !== '';
   }
 
-  clearFilters(): void {
-    this.filters.reset();
-  }
+  clearFilters(): void { this.filters.reset(); }
 
-  reload(): void {
-    this.refresh$.next();
-  }
+  reload(): void { this.refresh$.next(); }
 
   askDelete(employee: Employee): void {
     this.deleteError.set(null);
@@ -112,5 +131,26 @@ export class EmployeeListComponent {
         this.deleteError.set(parseApiError(err).message);
       },
     });
+  }
+
+  /** Returns 1–2 uppercase initials from a name. */
+  getInitials(name: string): string {
+    return name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(w => w[0])
+      .join('')
+      .toUpperCase();
+  }
+
+  /** Deterministic avatar background colour based on employee id. */
+  getAvatarColor(id: number): string {
+    return AVATAR_COLORS[id % AVATAR_COLORS.length];
+  }
+
+  /** Returns the CSS class for a department chip. */
+  getDeptClass(dept: string): string {
+    return DEPT_CLASS_MAP[dept] ?? 'dept-default';
   }
 }
