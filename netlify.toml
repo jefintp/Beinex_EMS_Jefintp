@@ -1,0 +1,21 @@
+[build]
+  base    = "frontend"
+  command = "npm run build"
+  publish = "dist/ems-frontend/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Forward API calls to the Go backend on Render. The browser only talks to
+# Netlify, so no CORS configuration is needed.
+[[redirects]]
+  from   = "/api/*"
+  to     = "https://beinex-ems-jefintp.onrender.com/api/:splat"
+  status = 200
+  force  = true
+
+# Angular routes (e.g. /employees/new): always serve the app on refresh.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
