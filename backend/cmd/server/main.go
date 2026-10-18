@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata" // lets the TZ environment variable (e.g. Asia/Kolkata) work on any host
 
 	"employee-management/internal/config"
 	"employee-management/internal/handler"
