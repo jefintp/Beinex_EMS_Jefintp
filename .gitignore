@@ -1,0 +1,22 @@
+# Secrets: never commit real passwords (the .env.example templates are kept)
+.env
+.env.*
+!.env.example
+
+# Backend (Go)
+*.exe
+*.test
+*.out
+backend/tmp/
+
+# Frontend (Angular / Node)
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

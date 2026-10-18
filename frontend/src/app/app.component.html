@@ -1,0 +1,23 @@
+<header class="app-header">
+  <div class="app-header-inner">
+    <a class="brand" routerLink="/employees">
+      <span class="brand-mark" aria-hidden="true">E</span>
+      <span>Employee Management</span>
+    </a>
+    <nav aria-label="Main">
+      <a routerLink="/employees" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Employees</a>
+      <a routerLink="/employees/new" routerLinkActive="active">Add employee</a>
+    </nav>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
+
+@if (notify.message(); as toast) {
+  <div class="toast" [class.toast-error]="toast.type === 'error'" role="status" aria-live="polite">
+    <span>{{ toast.text }}</span>
+    <button type="button" class="toast-close" aria-label="Dismiss" (click)="notify.dismiss()">&times;</button>
+  </div>
+}

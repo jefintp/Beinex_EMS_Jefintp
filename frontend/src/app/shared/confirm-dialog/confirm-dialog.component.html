@@ -1,0 +1,29 @@
+<div class="modal-backdrop" (click)="dismiss()">
+  <div
+    class="modal"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirm-dialog-title"
+    aria-describedby="confirm-dialog-body"
+    (click)="$event.stopPropagation()"
+  >
+    <h2 id="confirm-dialog-title">{{ heading() }}</h2>
+    <div id="confirm-dialog-body" class="modal-body">
+      <ng-content />
+    </div>
+
+    @if (error(); as message) {
+      <div class="alert alert-error" role="alert">{{ message }}</div>
+    }
+
+    <div class="modal-actions">
+      <button #cancelButton type="button" class="btn" [disabled]="busy()" (click)="dismiss()">Cancel</button>
+      <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="confirmed.emit()">
+        @if (busy()) {
+          <span class="spinner spinner-small" aria-hidden="true"></span>
+        }
+        {{ busy() ? busyLabel() : confirmLabel() }}
+      </button>
+    </div>
+  </div>
+</div>

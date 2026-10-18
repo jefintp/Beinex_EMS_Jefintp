@@ -1,0 +1,135 @@
+<section class="page page-narrow">
+  <header class="page-header">
+    <div>
+      <h1>{{ isEdit() ? 'Edit employee' : 'Add employee' }}</h1>
+      <p class="muted">
+        {{ isEdit() ? 'Update this employee’s details.' : 'Fill in the details of the new employee.' }}
+      </p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="card state-card" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>Loading employee…</span>
+    </div>
+  } @else if (loadError(); as message) {
+    <div class="card">
+      <div class="alert alert-error" role="alert">{{ message }}</div>
+      <a class="btn" routerLink="/employees">Back to employees</a>
+    </div>
+  } @else {
+    <form class="card form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (submitError(); as message) {
+        <div class="alert alert-error" role="alert">{{ message }}</div>
+      }
+
+      <div class="form-grid">
+        <div class="field" [class.has-error]="errorFor('name')">
+          <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            autocomplete="off"
+            [attr.aria-invalid]="!!errorFor('name')"
+            [attr.aria-describedby]="errorFor('name') ? 'name-error' : null"
+          />
+          @if (errorFor('name'); as msg) {
+            <p class="field-error" id="name-error">{{ msg }}</p>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="errorFor('email')">
+          <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="off"
+            [attr.aria-invalid]="!!errorFor('email')"
+            [attr.aria-describedby]="errorFor('email') ? 'email-error' : null"
+          />
+          @if (errorFor('email'); as msg) {
+            <p class="field-error" id="email-error">{{ msg }}</p>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="errorFor('department')">
+          <label for="department">Department <span class="req" aria-hidden="true">*</span></label>
+          <select
+            id="department"
+            formControlName="department"
+            [attr.aria-invalid]="!!errorFor('department')"
+            [attr.aria-describedby]="errorFor('department') ? 'department-error' : null"
+          >
+            <option value="" disabled>Select a department</option>
+            @for (department of departments; track department) {
+              <option [value]="department">{{ department }}</option>
+            }
+          </select>
+          @if (errorFor('department'); as msg) {
+            <p class="field-error" id="department-error">{{ msg }}</p>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="errorFor('designation')">
+          <label for="designation">Designation <span class="req" aria-hidden="true">*</span></label>
+          <input
+            id="designation"
+            type="text"
+            formControlName="designation"
+            autocomplete="off"
+            [attr.aria-invalid]="!!errorFor('designation')"
+            [attr.aria-describedby]="errorFor('designation') ? 'designation-error' : null"
+          />
+          @if (errorFor('designation'); as msg) {
+            <p class="field-error" id="designation-error">{{ msg }}</p>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="errorFor('joining_date')">
+          <label for="joining_date">Joining date <span class="req" aria-hidden="true">*</span></label>
+          <input
+            id="joining_date"
+            type="date"
+            [max]="today"
+            formControlName="joining_date"
+            [attr.aria-invalid]="!!errorFor('joining_date')"
+            [attr.aria-describedby]="errorFor('joining_date') ? 'joining_date-error' : null"
+          />
+          @if (errorFor('joining_date'); as msg) {
+            <p class="field-error" id="joining_date-error">{{ msg }}</p>
+          }
+        </div>
+
+        <div class="field" [class.has-error]="errorFor('status')">
+          <label for="status">Status <span class="req" aria-hidden="true">*</span></label>
+          <select
+            id="status"
+            formControlName="status"
+            [attr.aria-invalid]="!!errorFor('status')"
+            [attr.aria-describedby]="errorFor('status') ? 'status-error' : null"
+          >
+            @for (status of statuses; track status.value) {
+              <option [value]="status.value">{{ status.label }}</option>
+            }
+          </select>
+          @if (errorFor('status'); as msg) {
+            <p class="field-error" id="status-error">{{ msg }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a class="btn" routerLink="/employees" [class.is-disabled]="saving()">Cancel</a>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          @if (saving()) {
+            <span class="spinner spinner-small" aria-hidden="true"></span>
+          }
+          {{ saving() ? 'Saving…' : isEdit() ? 'Save changes' : 'Add employee' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>
